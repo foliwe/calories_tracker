@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1 class="text-sm mt-2 text-teal-800 -mb-2">Total Calories comsumed</h1>
+<div class="w-full bg-stone-200 rounded-full h-4 mb-4  my-3">
+    <div id="progress" class="bg-green-500 h-4 rounded-full " style="width: 0%"></div>
+</div>
+
+<h1 class="text-4xl text-teal-800 my-5">
+    Calories Tracker
+</h1>
+<form action="" method="POST">
+    {% csrf_token %}
+    <select name="food_consumed" id="food_consumed" class="py-2 px-2 bg-teal-100 text-teal-900 ">
+        {% for item in food %}
+        <option value="{{ item.name }}" class="text-teal-900 ">{{ item.name }}</option>
+        {% endfor %}
+    </select>
+    <button class="py-2 px-3 bg-green-500 text-green-900 rounded">Add Consumption</button>
+</form>
+<div class="grid grid-cols lg:grid-cols-2 gap-8">
+    <div class="">
+        <h1 class="my-8 text-2xl text-teal-800 tracking-wide">
+            Today's Comsumption <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.5" stroke="currentColor" class="w-6 h-6 inline">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
+            </svg>
+
+        </h1>
+
+        <div class="mt-5">
+
+
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500" id="table">
+                <thead class="text-xs text-teal-700 uppercase bg-teal-100 ">
+                    <tr class="">
+                        <th scope="col" class="px-2 py-3">Food Item</th>
+                        <th scope="col" class="px-2 py-3">Carbs(gm)</th>
+                        <th scope="col" class="px-2 py-3">Protein(gm)</th>
+                        <th scope="col" class="px-2 py-3">Fats(gm)</th>
+                        <th scope="col" class="px-2 py-3">Calories(gm)</th>
+                        <th scope="col" class="px-2 py-3"></th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for food in saved_food %}
+                    <tr class="bg-white border-b border-teal-200">
+                        <td class="p-3 text-sm w-72 font-semibold text-teal-800">{{ food.food_consumed.name }}</td>
+                        <td class="p-3 text-sm ">{{ food.food_consumed.carbs }}</td>
+                        <td class="p-3 text-sm ">{{ food.food_consumed.protien }}</td>
+                        <td class="p-3 text-sm {% if food.food_consumed.fat > 10 %}text-rose-500{% endif %}">
+                            {{food.food_consumed.fat }}</td>
+                        <td class="p-3 text-sm ">{{ food.food_consumed.calories }}</td>
+                        <td class="p-3 text-sm "><a href="{% url 'delete' food.id %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="#f43f5e" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+
+                            </a></td>
+                    </tr>
+                    {% endfor %}
+
+                    <tr class="bg-teal-100 font-semibold">
+                        <td class="p-3 text-sm">Total</td>
+                        <td id="carbsTotal" class="p-3 text-sm"></td>
+                        <td id="proteinTotal" class="p-3 text-sm"></td>
+                        <td id="fatTotal" class="p-3 text-sm"></td>
+                        <td id="caloriesTotal" class="p-3 text-sm"></td>
+                        <td class="p-3 text-sm"></td>
+                    </tr>
+
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <div class="">
+        <h1 class="my-10 text-2xl text-teal-800 tracking-wide ">
+            Today's breakdown
+        </h1>
+        <div class="p-3 bg-teal-100  mx-auto">
+            <h1 class="text-3xl text-teal-800">
+                Micronutrients Breakdown
+            </h1>
+        </div>
+        <div class="w-full">
+            <div class="w-[80%]">
+
+                <canvas id="myChart" class="p-4"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        calculateTotals();
+        updateProgressBar();
+    });
+
+    function calculateTotals() {
+        let carbsTotal = 0;
+        let proteinTotal = 0;
+        let fatTotal = 0;
+        let caloriesTotal = 0;
+
+        // Get all rows in the table body
+        let rows = document.querySelectorAll('#table tbody tr');
+
+        // Loop through each row and sum the values
+        rows.forEach(function (row) {
+            let carbs = parseFloat(row.cells[1].textContent) || 0;
+            let protein = parseFloat(row.cells[2].textContent) || 0;
+            let fat = parseFloat(row.cells[3].textContent) || 0;
+            let calories = parseFloat(row.cells[4].textContent) || 0;
+
+            carbsTotal += carbs;
+            proteinTotal += protein;
+            fatTotal += fat;
+            caloriesTotal += calories;
+        });
+
+        // Update the totals in the HTML
+        document.getElementById('carbsTotal').textContent = carbsTotal.toFixed(2);
+        document.getElementById('proteinTotal').textContent = proteinTotal.toFixed(2);
+        document.getElementById('fatTotal').textContent = fatTotal.toFixed(2);
+        document.getElementById('caloriesTotal').textContent = caloriesTotal.toFixed(2);
+
+        // Update the progress bar
+        updateProgressBar(caloriesTotal);
+
+        // Update the pie chart data
+        updatePieChartData(carbsTotal, proteinTotal, fatTotal);
+    }
+
+    function updateProgressBar(caloriesConsumed) {
+        const maxCalories = 2000;
+        const progressBar = document.getElementById('progress');
+
+        // Calculate the percentage of calories consumed
+        const percentage = (caloriesConsumed / maxCalories) * 100;
+
+        // Set the width of the progress bar
+        progressBar.style.width = `${percentage}%`;
+    }
+
+    function updatePieChartData(carbsTotal, proteinTotal, fatTotal) {
+        const ctx = document.getElementById('myChart');
+
+        // Calculate the percentages
+        const total = carbsTotal + proteinTotal + fatTotal;
+        const carbsPercentage = (carbsTotal / total) * 100;
+        const proteinPercentage = (proteinTotal / total) * 100;
+        const fatPercentage = (fatTotal / total) * 100;
+
+        // Update the pie chart data
+        myChart.data.datasets[0].data = [carbsPercentage.toFixed(2), proteinPercentage.toFixed(2), fatPercentage.toFixed(2)];
+        myChart.update();
+    }
+
+    const ctx = document.getElementById('myChart');
+
+    const myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Carbs', 'Protein', 'Fats'],
+            datasets: [{
+                label: '# of Votes',
+                data: [0, 0, 0], // Initial data, will be updated dynamically
+                backgroundColor: ['#facc15', '#14b8a6', '#ef4444'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+
+{% endblock %}

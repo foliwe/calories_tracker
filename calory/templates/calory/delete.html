@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+<div class="container mx-auto">
+    {% block content %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        Are you you want to delete?
+        <button class="py-2 px-2 bg-green-500">yes</button>
+    </form>
+    {% endblock %}
+</div>

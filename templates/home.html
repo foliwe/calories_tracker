@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+<div class="container mx-auto">
+    {% block content %}
+    <div class="flex justify-center items-center flex-col">
+        <h1 class="text-8xl">
+            Welcome
+        </h1>
+        <p>Start your weight lose Journey</p>
+
+        <a href="{% url 'tracker' %}" class="py-3 px-4 bg-teal-200 text-green-800">
+            Start Here
+        </a>
+    </div>
+    {% endblock %}
+</div>
